@@ -1,62 +1,105 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Roboto, sans-serif;
     margin: 0;
     padding: 20px;
-    background-color: #f0f0f0;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
 }
 
 .container {
     max-width: 600px;
     margin: 0 auto;
     background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
 h1 {
     text-align: center;
-    color: #333;
+    color: #2c3e50;
+    font-size: 2.5em;
+    margin-bottom: 30px;
+    font-weight: 600;
+}
+
+h2 {
+    color: #34495e;
+    font-size: 1.5em;
+    font-weight: 500;
 }
 
 .counter-section {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
+    padding: 30px;
+    background: #f8f9fa;
+    border-radius: 15px;
 }
 
 #count-button {
-    padding: 15px 30px;
+    padding: 15px 40px;
     font-size: 18px;
-    background-color: #4CAF50;
+    background: linear-gradient(45deg, #2ecc71, #27ae60);
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 30px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
 }
 
 #count-button:hover {
-    background-color: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+}
+
+#count-button:active {
+    transform: translateY(1px);
 }
 
 .stats-section {
-    border-top: 1px solid #ddd;
-    padding-top: 20px;
+    border-top: 2px solid #eef2f7;
+    padding-top: 30px;
 }
 
 #stats-container {
-    margin-top: 15px;
+    margin-top: 20px;
 }
 
 .stat-item {
     display: flex;
     justify-content: space-between;
-    padding: 10px;
-    border-bottom: 1px solid #eee;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    transition: transform 0.2s ease;
+}
+
+.stat-item:hover {
+    transform: translateX(5px);
+    background: #f1f3f5;
 }
 
 #today-count {
-    font-size: 24px;
+    font-size: 3em;
     font-weight: bold;
-    color: #333;
+    color: #2ecc71;
+    margin: 20px 0;
+    text-shadow: 0 2px 10px rgba(46, 204, 113, 0.2);
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    #today-count {
+        font-size: 2.5em;
+    }
 } 

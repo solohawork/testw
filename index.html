@@ -14,11 +14,25 @@
         <div class="counter-section">
             <h2>Сегодня</h2>
             <p id="today-count">0 затяжек</p>
-            <button id="count-button">Добавить затяжку</button>
+            <button id="count-button">Добавить<br>затяжку</button>
+        </div>
+        <div class="limit-section">
+            <button id="set-limit-button">Установить лимит</button>
+            <div id="limit-display" style="display: none;">
+                <p>Текущий лимит: <span id="current-limit">не установлен</span></p>
+            </div>
+            <div id="limit-warning" style="display: none;">
+                <p class="warning-text">Хватит курить!</p>
+            </div>
         </div>
 
         <div class="stats-section">
-            <h2>Статистика по дням</h2>
+            <div class="stats-header">
+                <h2>Статистика по дням</h2>
+                <button id="view-stats-button" onclick="window.location.href='statistics.html'">
+                    Открыть полную статистику
+                </button>
+            </div>
             <div id="stats-container"></div>
         </div>
     </div>

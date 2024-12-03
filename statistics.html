@@ -2,19 +2,25 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Статистика затяжек</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         <div class="header-with-back">
-            <button class="back-button" onclick="window.location.href='index.html'">← Назад</button>
-            <h1>Статистика затяжек</h1>
+            <button class="back-button" onclick="history.back()">← Назад</button>
+            <h1>Полная статистика</h1>
         </div>
         
+        <div class="stats-summary-section">
+            <div id="stats-summary"></div>
+        </div>
+
         <div class="stats-full">
+            <h2>История по дням</h2>
             <div id="stats-container-full"></div>
         </div>
     </div>

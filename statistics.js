@@ -1,7 +1,48 @@
 class StatisticsViewer {
     constructor() {
+        // Инициализация Telegram WebApp
+        this.tg = window.Telegram.WebApp;
+        
+        // Сообщаем приложению, что мы готовы к отображению
+        this.tg.ready();
+        
+        // Настраиваем цвета в соответствии с темой пользователя
+        this.setupTheme();
+        
         this.data = this.loadData();
         this.displayStats();
+
+        // Добавляем слушатель изменения темы
+        this.tg.onEvent('themeChanged', () => {
+            this.setupTheme();
+        });
+
+        // Настраиваем кнопку "Назад"
+        this.setupBackButton();
+    }
+
+    setupTheme() {
+        // Применяем цвета темы Telegram
+        document.documentElement.style.setProperty('--tg-theme-bg-color', this.tg.themeParams.bg_color);
+        document.documentElement.style.setProperty('--tg-theme-text-color', this.tg.themeParams.text_color);
+        document.documentElement.style.setProperty('--tg-theme-hint-color', this.tg.themeParams.hint_color);
+        document.documentElement.style.setProperty('--tg-theme-link-color', this.tg.themeParams.link_color);
+        document.documentElement.style.setProperty('--tg-theme-button-color', this.tg.themeParams.button_color);
+        document.documentElement.style.setProperty('--tg-theme-button-text-color', this.tg.themeParams.button_text_color);
+
+        // Устанавливаем цвет хедера
+        this.tg.setHeaderColor(this.tg.themeParams.bg_color);
+        
+        // Устанавливаем цвет фона
+        this.tg.setBackgroundColor(this.tg.themeParams.bg_color);
+    }
+
+    setupBackButton() {
+        // Настраиваем кнопку "Назад" в хедере Telegram
+        this.tg.BackButton.show();
+        this.tg.BackButton.onClick(() => {
+            window.history.back();
+        });
     }
 
     loadData() {
@@ -10,50 +51,87 @@ class StatisticsViewer {
     }
 
     displayStats() {
-        const statsContainer = document.getElementById('stats-container-full');
-        statsContainer.innerHTML = '';
+        const dates = Object.keys(this.data);
+        if (dates.length === 0) {
+            this.displayEmptyState();
+            return;
+        }
 
-        // Сортируем даты в обратном порядке
-        const sortedDates = Object.keys(this.data).sort((a, b) => b.localeCompare(a));
+        this.displaySummary(dates);
+        this.displayDetailedStats(dates);
+    }
 
-        // Добавляем общую статистику
-        const totalPuffs = Object.values(this.data).reduce((sum, count) => sum + count, 0);
-        const avgPuffs = Math.round(totalPuffs / sortedDates.length);
-
-        const statsHeader = document.createElement('div');
-        statsHeader.className = 'stats-summary';
-        statsHeader.innerHTML = `
-            <div class="summary-item">
-                <span class="summary-label">Всего дней:</span>
-                <span class="summary-value">${sortedDates.length}</span>
-            </div>
-            <div class="summary-item">
-                <span class="summary-label">Всего затяжек:</span>
-                <span class="summary-value">${totalPuffs}</span>
-            </div>
-            <div class="summary-item">
-                <span class="summary-label">В среднем в день:</span>
-                <span class="summary-value">${avgPuffs}</span>
+    displayEmptyState() {
+        const container = document.getElementById('stats-container-full');
+        container.innerHTML = `
+            <div class="empty-state">
+                <p>Пока нет данных о затяжках</p>
             </div>
         `;
-        statsContainer.appendChild(statsHeader);
+    }
 
-        // Добавляем статистику по дням
+    displaySummary(dates) {
+        const totalPuffs = Object.values(this.data).reduce((sum, count) => sum + count, 0);
+        const avgPuffs = Math.round(totalPuffs / dates.length);
+        const maxPuffs = Math.max(...Object.values(this.data));
+        
+        const summaryContainer = document.getElementById('stats-summary');
+        summaryContainer.innerHTML = `
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <span class="summary-value">${dates.length}</span>
+                    <span class="summary-label">Дней записи</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-value">${totalPuffs}</span>
+                    <span class="summary-label">Всего затяжек</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-value">${avgPuffs}</span>
+                    <span class="summary-label">В среднем в день</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-value">${maxPuffs}</span>
+                    <span class="summary-label">Максимум за день</span>
+                </div>
+            </div>
+        `;
+    }
+
+    displayDetailedStats(dates) {
+        const container = document.getElementById('stats-container-full');
+        container.innerHTML = '';
+
+        // Сортируем даты в обратном порядке
+        const sortedDates = dates.sort((a, b) => b.localeCompare(a));
+
         sortedDates.forEach(date => {
             const statItem = document.createElement('div');
             statItem.className = 'stat-item';
             
-            const formattedDate = new Date(date).toLocaleDateString('ru-RU');
+            const formattedDate = new Date(date).toLocaleDateString('ru-RU', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
             statItem.innerHTML = `
-                <span>${formattedDate}</span>
-                <span>${this.data[date]} затяжек</span>
+                <div class="stat-date">
+                    <span class="date-full">${formattedDate}</span>
+                </div>
+                <div class="stat-count">
+                    <span class="count-value">${this.data[date]}</span>
+                    <span class="count-label">затяжек</span>
+                </div>
             `;
             
-            statsContainer.appendChild(statItem);
+            container.appendChild(statItem);
         });
     }
 }
 
+// Инициализация приложения
 document.addEventListener('DOMContentLoaded', () => {
     new StatisticsViewer();
 }); 

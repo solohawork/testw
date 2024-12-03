@@ -1,5 +1,15 @@
 class PuffTracker {
     constructor() {
+        // Инициализация Telegram WebApp
+        this.tg = window.Telegram.WebApp;
+        
+        // Сообщаем приложению, что мы готовы к отображению
+        this.tg.ready();
+        
+        // Настраиваем цвета в соответствии с темой пользователя
+        this.setupTheme();
+        
+        // Инициализация данных
         this.data = this.loadData();
         this.todayKey = this.getDateKey(new Date());
         this.limit = localStorage.getItem('puffLimit') ? parseInt(localStorage.getItem('puffLimit')) : null;
@@ -8,6 +18,39 @@ class PuffTracker {
         this.setupEventListeners();
         this.updateDisplay();
         this.updateLimitDisplay();
+
+        // Добавляем слушатель изменения темы
+        this.tg.onEvent('themeChanged', () => {
+            this.setupTheme();
+        });
+
+        // Настраиваем основную кнопку
+        this.setupMainButton();
+    }
+
+    setupTheme() {
+        // Применяем цвета темы Telegram
+        document.documentElement.style.setProperty('--tg-theme-bg-color', this.tg.themeParams.bg_color);
+        document.documentElement.style.setProperty('--tg-theme-text-color', this.tg.themeParams.text_color);
+        document.documentElement.style.setProperty('--tg-theme-hint-color', this.tg.themeParams.hint_color);
+        document.documentElement.style.setProperty('--tg-theme-link-color', this.tg.themeParams.link_color);
+        document.documentElement.style.setProperty('--tg-theme-button-color', this.tg.themeParams.button_color);
+        document.documentElement.style.setProperty('--tg-theme-button-text-color', this.tg.themeParams.button_text_color);
+
+        // Устанавливаем цвет хедера
+        this.tg.setHeaderColor(this.tg.themeParams.bg_color);
+        
+        // Устанавливаем цвет фона
+        this.tg.setBackgroundColor(this.tg.themeParams.bg_color);
+    }
+
+    setupMainButton() {
+        const mainButton = this.tg.MainButton;
+        mainButton.setText('Добавить затяжку');
+        mainButton.onClick(() => {
+            this.addPuff();
+        });
+        mainButton.show();
     }
 
     getDateKey(date) {
@@ -47,7 +90,7 @@ class PuffTracker {
                 this.limit = limitNumber;
                 localStorage.setItem('puffLimit', limitNumber);
                 this.updateLimitDisplay();
-                // Проверяем текущее количество затяжек после установки лимита
+                // Проверяем текущее количест��о затяжек после установки лимита
                 this.checkLimit();
             } else {
                 alert('Пожалуйста, введите положительное число');
@@ -79,81 +122,16 @@ class PuffTracker {
     }
 
     showLimitModal() {
-        // Создаем модальное окно, если его еще нет
-        let modal = document.getElementById('limit-modal');
-        if (!modal) {
-            modal = document.createElement('div');
-            modal.id = 'limit-modal';
-            modal.className = 'modal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <h2>Внимание!</h2>
-                    <p>Хватит курить!</p>
-                    <button onclick="this.parentElement.parentElement.style.display='none'">OK</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-
-            // Добавляем стили для модального окна
-            const style = document.createElement('style');
-            style.textContent = `
-                .modal {
-                    display: none;
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    width: 100%;
-                    height: 100%;
-                    background-color: rgba(0,0,0,0.5);
-                    z-index: 1000;
-                    animation: fadeIn 0.3s ease;
-                    padding: var(--sat) var(--sar) var(--sab) var(--sal);
-                    box-sizing: border-box;
-                }
-                .modal-content {
-                    position: relative;
-                    background-color: #fff;
-                    margin: 15% auto;
-                    padding: 20px;
-                    width: 80%;
-                    max-width: 400px;
-                    border-radius: 15px;
-                    text-align: center;
-                    animation: slideIn 0.3s ease;
-                    margin-top: max(15%, calc(15% + var(--sat)));
-                }
-                .modal-content h2 {
-                    color: #e74c3c;
-                    margin-bottom: 10px;
-                }
-                .modal-content button {
-                    padding: 10px 30px;
-                    background: linear-gradient(45deg, #e74c3c, #c0392b);
-                    color: white;
-                    border: none;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                    margin-top: 15px;
-                }
-                .modal-content button:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
-                }
-                @keyframes fadeIn {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
-                }
-                @keyframes slideIn {
-                    from { transform: translateY(-100px); opacity: 0; }
-                    to { transform: translateY(0); opacity: 1; }
-                }
-            `;
-            document.head.appendChild(style);
-        }
-        modal.style.display = 'block';
+        // Используем нативный попап Telegram вместо своего модального окна
+        this.tg.showPopup({
+            title: 'Внимание!',
+            message: 'Хватит курить! Вы достигли дневного лимита.',
+            buttons: [{
+                id: "ok",
+                type: "ok",
+                text: "Понятно"
+            }]
+        });
     }
 
     addPuff() {
